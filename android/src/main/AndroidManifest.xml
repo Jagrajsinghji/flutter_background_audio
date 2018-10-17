@@ -1,0 +1,22 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+package="com.backgroundaudio">
+<application>
+    <receiver android:name=".AudioPlayer$NotificationReturnSlot">
+        <intent-filter>
+            <action android:name="action.SELECT" />
+            <action android:name="action.NEXT" />
+            <action android:name="action.PREV" />
+        </intent-filter>
+    </receiver>
+    <service android:name=".AudioPlayer" android:enabled="true">
+        <intent-filter>
+            <action android:name="action.PLAY" />
+            <action android:name="action.TOGGLE" />
+            <action android:name="action.STOP" />
+            <action android:name="action.GET_POSITION" />
+            <action android:name="action.GET_DURATION" />
+            <action android:name="action.IS_PLAYING" />
+        </intent-filter>
+    </service>
+</application>
+</manifest>
