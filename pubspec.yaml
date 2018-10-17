@@ -1,12 +1,13 @@
 name: background_audio
 description: A new Flutter plugin.
 version: 0.0.1
-author:
-homepage:
+author: Dmitry <dima.potapov.98@mail.ru>
+homepage: https://github.com/Zeratyll/flutter_background_audio
 
 environment:
-  sdk: ">=2.0.0-dev.68.0 <3.0.0"
-
+  sdk: ">=2.0.0-dev.28.0 <3.0.0"
+  flutter: ">=0.1.4 <2.0.0"
+  
 dependencies:
   flutter:
     sdk: flutter

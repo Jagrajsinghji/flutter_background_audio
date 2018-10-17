@@ -41,15 +41,9 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    print('asassa2222ddad1232132s');
 
     BackgroundAudio.init().then((e) {
-      print('asassaddad1232132s -------------------- ');
-
       if (BackgroundAudio.playlist != null) {
-        print(BackgroundAudio.song);
-        print('asassaddad1232132s ---------------------- ');
-
         if (BackgroundAudio.playing) {
           setState(() => status = 'play');
         } else {
@@ -71,11 +65,11 @@ class _MyAppState extends State<MyApp> {
     });
     
     BackgroundAudio.onNext(() {
-      //print(BackgroundAudio.song);
+      
     });
 
     BackgroundAudio.onPrev(() {
-      //print(BackgroundAudio.song);
+      
     });
 
     BackgroundAudio.onSelect(() {

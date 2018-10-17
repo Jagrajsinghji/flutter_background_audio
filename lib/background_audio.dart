@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
-import 'package:meta/meta.dart';
-import 'dart:convert';
 
 const MethodChannel _methodChannel = const MethodChannel('method_channel');
 const EventChannel _eventChannel = const EventChannel('event_channel');
