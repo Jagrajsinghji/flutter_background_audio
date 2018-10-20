@@ -11,31 +11,35 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String status = 'stopped';
   
-  List<Map> playlists = [
-    {
-      "songs": [{
+  List<BackgroundAudioPlaylist> playlists = [
+    BackgroundAudioPlaylist(
+        songs: [{
+          "id": "1",
           "title": "First song",
           "author": "Unknown",
-          "url": "https://youvix.org/storage/songs/NpUAUkN7mLWn4MAqHTadV4TMK74YvNO4YiJMoW0fIMiM0iskfT.mp3"
+          "url": "https://youvix.org/songs/stream?song_id=671&s=867ad6332d7bc8f197e67cd34fbc7528",
         }, {
-          "title": "New Order",
-          "author": "Blue Monday 88",
-          "url": "https://youvix.org/storage/songs/OpeDvywtyJcoqBk4dxnYM0MzYSPM9QHUulVHwGUV5Xy8A67NLw.mp3"
+          "id": "2",
+          "title": "say it",
+          "author": "Blue oktober",
+          "url": "https://youvix.org/songs/stream?song_id=2049&s=eca61993bdd45569ebd385cd3cc58971",
         }],
-      "metadata": {"id": "1", "title": "Playlist one"}
-    },
-    {
-      "songs": [{
+      metadata: {"id": "1", "title": "Playlist one"}
+    ),
+    BackgroundAudioPlaylist(
+        songs: [{
+          "id": "3",
           "title": "First song(2 playlist)",
           "author": "Unknown",
-          "url": "https://youvix.org/storage/songs/NpUAUkN7mLWn4MAqHTadV4TMK74YvNO4YiJMoW0fIMiM0iskfT.mp3"
+          "url": "https://youvix.org/songs/stream?song_id=671&s=867ad6332d7bc8f197e67cd34fbc7528",
         }, {
+          "id": "4",
           "title": "New Order(2 playlist)",
           "author": "Blue Monday 88",
-          "url": "https://youvix.org/storage/songs/OpeDvywtyJcoqBk4dxnYM0MzYSPM9QHUulVHwGUV5Xy8A67NLw.mp3"
+          "url": "https://youvix.org/songs/stream?song_id=2049&s=eca61993bdd45569ebd385cd3cc58971",
         }],
-      "metadata": {"id": "2", "title": "Playlist two"}
-    }
+        metadata: {"id": "2", "title": "Playlist two"}
+    )
   ];
   
   @override
@@ -89,26 +93,27 @@ class _MyAppState extends State<MyApp> {
     BackgroundAudio.toggle();
   }
 
-  play(Map playlist, int index) async {
-    await BackgroundAudio.setPlaylist(BackgroundAudioPlaylist.fromJson(playlist));
+  play(BackgroundAudioPlaylist playlist, int index) async {
+    await BackgroundAudio.setPlaylist(playlist);
     BackgroundAudio.play(index);
   }
 
-  Widget _buildPlaylist(Map playlist) {
+  Widget _buildPlaylist(BackgroundAudioPlaylist playlist) {
     return Container(
       width: 180.0,
       margin: EdgeInsets.only(top: 20.0),
       child: Column(
         children: <Widget>[
-          Text(playlist["metadata"]["title"], style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0)),
+          Text(playlist.metadata["title"], style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0)),
           ListView.builder(
             shrinkWrap: true,
             itemBuilder: (context, i) => ListTile(
-              title: Text(playlist["songs"][i]["title"], textAlign: TextAlign.center, style: TextStyle(fontSize: 14.0),),
+              title: Text(playlist.songs[i]["title"], textAlign: TextAlign.center, style: TextStyle(fontSize: 14.0),),
               onTap: () {
                 play(playlist, i);
               },
-            ),itemCount: playlist["songs"].length,
+            ),
+            itemCount: playlist.songs.length,
           )
         ],
       ),
@@ -135,8 +140,8 @@ class _MyAppState extends State<MyApp> {
               BackgroundAudio.song == null ? Container() :
               Flexible(
                 child: Column(children: <Widget>[
-                  Text(BackgroundAudio.song.title, style: TextStyle(fontSize: 16.0)),
-                  Text(BackgroundAudio.song.author),
+                  Text(BackgroundAudio.song["title"], style: TextStyle(fontSize: 16.0)),
+                  Text(BackgroundAudio.song["author"]),
                   SizedBox(height: 12.0),
                   Text((BackgroundAudio.playlist.metadata["title"] ?? ""), 
                     style: TextStyle(fontSize: 16.0, color: Colors.grey),

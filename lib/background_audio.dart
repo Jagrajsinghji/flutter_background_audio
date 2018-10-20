@@ -4,51 +4,23 @@ import 'package:flutter/services.dart';
 const MethodChannel _methodChannel = const MethodChannel('method_channel');
 const EventChannel _eventChannel = const EventChannel('event_channel');
 
-class BackgroundAudioSong {
-  final String title;
-  final String author;
-  final String url;
 
-  BackgroundAudioSong({this.title, this.author, this.url});
-
-  factory BackgroundAudioSong.fromJson(Map data) {
-    return BackgroundAudioSong(
-      title: data['title'] as String,
-      author: data['author'] as String,
-      url: data['url'] as String
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {"title": this.title, "author": this.author, "url": this.url};
-  }
-}
 
 class BackgroundAudioPlaylist {
-  BackgroundAudioPlaylist({this.songs, this.metadata});
-
-  List<BackgroundAudioSong> songs = [];
+  List<Map<String, dynamic>> songs = [];
   Map<String, dynamic> metadata;
 
-  factory BackgroundAudioPlaylist.fromJson(Map data) {
-    print(data);
-    
-    List<BackgroundAudioSong> songs = [];
-    //data['songs'].map<BackgroundAudioSong>((json) {
-    //  return BackgroundAudioSong.fromJson(json);
-   // }).toList();
-    for(var item in data['songs']) {
-      songs.add(BackgroundAudioSong.fromJson(item));
-    }
+  BackgroundAudioPlaylist({this.songs, this.metadata});
 
+  factory BackgroundAudioPlaylist.fromJson(Map data) {
     return BackgroundAudioPlaylist(
-      songs: songs,
-      metadata: Map.from(data['metadata'])
+      songs: data['songs'].map<Map<String, dynamic>>((song) => Map.from<String, dynamic>(song)).toList(),
+      metadata: Map.from<String, dynamic>(data['metadata'])
     );
   }
 
   Map<String, dynamic> toMap() {
-    return {"songs": this.songs.map((f) => f.toMap()).toList(), "metadata": this.metadata};
+    return {"songs": this.songs, "metadata": this.metadata};
   }
 }
 
@@ -60,7 +32,7 @@ class BackgroundAudio {
   static BackgroundAudioPlaylist playlist;
   static int index;
 
-  static BackgroundAudioSong get song {
+  static Map<String, dynamic> get song {
     if (playlist == null || playlist.songs.length == 0) {
       return null;
     }
@@ -93,15 +65,16 @@ class BackgroundAudio {
 
   static _updateDuration() {
     _methodChannel.invokeMethod('getDuration').then((sec) {
-      print('$sec adasdasda-sd-a d-asd-sd--sdsa');
       duration = sec;
       _callEvent('duration', data: sec);
     });
   }
 
   static setPlaylist(BackgroundAudioPlaylist p) async {
-    BackgroundAudio.playlist = p;
-    await _methodChannel.invokeMethod('setPlaylist', {"playlist": p.toMap()});
+    if (BackgroundAudio.playlist != p) {
+      BackgroundAudio.playlist = p;
+      await _methodChannel.invokeMethod('setPlaylist', {"playlist": p.toMap()});
+    }
   }
 
   static play(int i) async {
@@ -117,6 +90,7 @@ class BackgroundAudio {
   }
 
   static stop() {
+    playing = false;
     _methodChannel.invokeMethod('stop');
   }
 
@@ -164,7 +138,6 @@ class BackgroundAudio {
   }
 
   static _onEvent(dynamic name) {
-    print("_onEvent $name");
     dynamic data;
 
     if (name == "next" || name == "prev") {

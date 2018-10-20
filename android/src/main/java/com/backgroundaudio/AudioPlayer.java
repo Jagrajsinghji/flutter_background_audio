@@ -42,6 +42,7 @@ public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
     private static MediaPlayer player;
 
     public static boolean play = false;
+    public static boolean prepared = false;
 
     private static List<Map<String, String>> songs = new ArrayList<Map<String, String>>();
     private static Map<String, String> metadata = new HashMap<String, String>();
@@ -88,17 +89,17 @@ public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
     }
 
     public static int getPosition() {
-        if (player != null || songs.size() == 0) {
+        if (player != null && prepared) {
             return player.getCurrentPosition() / 1000;
         }
-        return 999;
+        return 0;
     }
 
     public static int getDuration() {
-        if (player != null || songs.size() == 0) {
+        if (player != null && prepared) {
             return player.getDuration() / 1000;
         }
-        return 999;
+        return 0;
     }
 
     public static void seekTo(int sec) {
@@ -150,6 +151,7 @@ public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
                 mNM.cancel(1);
                 player.stop();
                 player.release();
+                prepared = false;
                 songs = new ArrayList<Map<String, String>>();
                 metadata = new HashMap<String, String>();
                 index = 0;
@@ -178,6 +180,7 @@ public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
     @Override
     public void onPrepared(MediaPlayer mp) {
         player.start();
+        prepared = true;
     }
 
     private void play() {
