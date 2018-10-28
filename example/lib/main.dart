@@ -69,11 +69,11 @@ class _MyAppState extends State<MyApp> {
     });
     
     BackgroundAudio.onNext(() {
-      
+      setState((){});
     });
 
     BackgroundAudio.onPrev(() {
-      
+      setState((){});
     });
 
     BackgroundAudio.onSelect(() {
@@ -99,24 +99,24 @@ class _MyAppState extends State<MyApp> {
   }
 
   Widget _buildPlaylist(BackgroundAudioPlaylist playlist) {
-    return Container(
-      width: 180.0,
-      margin: EdgeInsets.only(top: 20.0),
-      child: Column(
-        children: <Widget>[
-          Text(playlist.metadata["title"], style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0)),
-          ListView.builder(
-            shrinkWrap: true,
-            itemBuilder: (context, i) => ListTile(
-              title: Text(playlist.songs[i]["title"], textAlign: TextAlign.center, style: TextStyle(fontSize: 14.0),),
-              onTap: () {
-                play(playlist, i);
-              },
-            ),
-            itemCount: playlist.songs.length,
-          )
-        ],
-      ),
+    return Flexible(
+      flex: 2,
+      child: Padding(
+        padding: EdgeInsets.only(top: 20.0),
+        child: Column(
+          children: <Widget>[
+            Text(playlist.metadata["title"], style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0)),
+            ListView.builder(
+              shrinkWrap: true,
+              itemBuilder: (context, i) => ListTile(
+                title: Text(playlist.songs[i]["title"], textAlign: TextAlign.center, style: TextStyle(fontSize: 14.0),),
+                onTap: () => play(playlist, i),
+              ),
+              itemCount: playlist.songs.length,
+            )
+          ],
+        ),
+      )
     );
   }
 
@@ -159,14 +159,28 @@ class _MyAppState extends State<MyApp> {
              max: BackgroundAudio.duration.toDouble(),
            ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              FlatButton(child: Icon(Icons.skip_previous, size: 50.0), onPressed: BackgroundAudio.prev),
-              FlatButton(child: Icon(
-                status == 'pause' ? Icons.play_circle_outline : Icons.pause_circle_outline,
-                size: 50.0,
-              ), onPressed: toggle),
-              FlatButton(child: Icon(Icons.skip_next, size: 50.0), onPressed: BackgroundAudio.next),
+              Container(
+                child: FlatButton(padding: EdgeInsets.all(4.0), child: Icon(Icons.repeat, size: 24.0), onPressed: BackgroundAudio.toggleRepeat),
+                width: 40.0
+              ),
+              Container(
+                  child: FlatButton(padding: EdgeInsets.all(4.0), child: Icon(Icons.skip_previous, size: 30.0), onPressed: BackgroundAudio.prev),
+                  width: 50.0
+              ),
+              Container(
+                  child: FlatButton(padding: EdgeInsets.all(4.0), child: Icon(status == 'pause' ? Icons.play_circle_outline : Icons.pause_circle_outline, size: 40.0,), onPressed: toggle),
+                  width: 60.0
+              ),
+              Container(
+                  child: FlatButton(padding: EdgeInsets.all(4.0), child: Icon(Icons.skip_next, size: 30.0), onPressed: BackgroundAudio.next),
+                  width: 50.0
+              ),
+              Container(
+                  child: FlatButton(padding: EdgeInsets.all(4.0), child: Icon(Icons.shuffle, size: 24.0), onPressed: BackgroundAudio.toggleShuffle),
+                  width: 40.0
+              ),
             ]
           ),
         ]

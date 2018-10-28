@@ -110,6 +110,14 @@ public class BackgroundAudioPlugin implements MethodCallHandler, StreamHandler {
                 AudioPlayer.setPlaylist((HashMap)playlist);
                 result.success(true);
                 break;
+            case "toggleRepeat":
+                AudioPlayer.repeat = !AudioPlayer.repeat;
+                result.success(true);
+                break;
+            case "toggleShuffle":
+                AudioPlayer.shuffle = !AudioPlayer.shuffle;
+                result.success(true);
+                break;
             default:
                 result.notImplemented();
                 break;

@@ -15,12 +15,14 @@ import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * Created by dmitry on 02.10.18.
@@ -47,6 +49,9 @@ public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
     private static List<Map<String, String>> songs = new ArrayList<Map<String, String>>();
     private static Map<String, String> metadata = new HashMap<String, String>();
     public static int index = 0;
+
+    public static boolean repeat = false;
+    public static boolean shuffle = false;
 
     @Override
     public void onCreate() {
@@ -166,9 +171,26 @@ public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
     @Override
     public void onCompletion(MediaPlayer mp) {
         if (mp.getCurrentPosition() > 0) {
-            index = index == songs.size()-1 ? 0 : index+1;
-            play();
-            callEvent("next");
+            if (!repeat) {
+                if (shuffle) {
+                    Random r = new Random();
+                    int max = songs.size();
+                    int min = 0;
+                    int new_index = r.nextInt((max-min)+1)+min;
+                    if (new_index == index) {
+                        new_index = r.nextInt((max-min)+1)+min;
+                    }
+                    index = new_index;
+                } else {
+                    index = index == songs.size()-1 ? 0 : index+1;
+                }
+                callEvent("next");
+                play();
+            } else {
+                player.seekTo(0);
+                player.start();
+                callEvent("play");
+            }
         }
     }
 
@@ -219,7 +241,7 @@ public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
     private void showNotification() {
         NotificationCompat.Builder nBuilder = new NotificationCompat.Builder(this, CHANNEL)
                 .setSmallIcon(R.drawable.ic_stat_music_note)
-                .setPriority(Notification.PRIORITY_MAX)
+                .setPriority(Notification.PRIORITY_DEFAULT)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setOnlyAlertOnce(true)
                 .setVibrate(new long[]{0L})

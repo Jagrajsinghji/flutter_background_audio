@@ -31,6 +31,8 @@ class BackgroundAudio {
   static Map<String, Function> _listeners = new Map();
   static BackgroundAudioPlaylist playlist;
   static int index;
+  static bool repeat = false;
+  static bool shuffle = false;
 
   static Map<String, dynamic> get song {
     if (playlist == null || playlist.songs.length == 0) {
@@ -57,7 +59,7 @@ class BackgroundAudio {
       position = await _methodChannel.invokeMethod('getPosition');
       _callEvent('position', data: position);
 
-      if (duration == 0) {
+      if (duration <= 0) {
         _updateDuration();
       }
     });
@@ -75,6 +77,16 @@ class BackgroundAudio {
       BackgroundAudio.playlist = p;
       await _methodChannel.invokeMethod('setPlaylist', {"playlist": p.toMap()});
     }
+  }
+
+  static toggleRepeat() {
+    repeat = !repeat;
+    _methodChannel.invokeMethod('toggleRepeat');
+  }
+
+  static toggleShuffle() {
+    shuffle = !shuffle;
+    _methodChannel.invokeMethod('toggleShuffle');
   }
 
   static play(int i) async {
