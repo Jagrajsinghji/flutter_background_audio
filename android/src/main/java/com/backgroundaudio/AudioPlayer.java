@@ -50,6 +50,8 @@ public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
     private static Map<String, String> metadata = new HashMap<String, String>();
     public static int index = 0;
 
+    public static List<Map> customOptions = new ArrayList<Map>();
+
     public static boolean repeat = false;
     public static boolean shuffle = false;
 
@@ -64,6 +66,18 @@ public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
         mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         createNotificationChannel();
         showNotification();
+    }
+
+    public static void setCustomOption(HashMap option) {
+        for (Map map: AudioPlayer.customOptions) {
+            if(map.get("name").equals(option.get("name"))) {
+                map.clear();
+                map.put("name", option.get("name"));
+                map.put("value", option.get("value"));
+                return;
+            }
+        }
+        customOptions.add(option);
     }
 
     public static void setPlaylist(HashMap p) {
@@ -159,6 +173,7 @@ public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
                 prepared = false;
                 songs = new ArrayList<Map<String, String>>();
                 metadata = new HashMap<String, String>();
+                customOptions = new ArrayList<Map>();
                 index = 0;
                 callEvent("stop");
                 stopSelf();
@@ -174,12 +189,13 @@ public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
             if (!repeat) {
                 if (shuffle) {
                     Random r = new Random();
-                    int max = songs.size();
+                    int max = songs.size()-1;
                     int min = 0;
                     int new_index = r.nextInt((max-min)+1)+min;
                     if (new_index == index) {
-                        new_index = r.nextInt((max-min)+1)+min;
+                        new_index = new_index > 0 ? new_index-1 : max;
                     }
+
                     index = new_index;
                 } else {
                     index = index == songs.size()-1 ? 0 : index+1;

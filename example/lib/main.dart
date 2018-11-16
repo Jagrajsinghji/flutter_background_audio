@@ -37,6 +37,11 @@ class _MyAppState extends State<MyApp> {
           "title": "New Order(2 playlist)",
           "author": "Blue Monday 88",
           "url": "https://youvix.org/songs/stream?song_id=2049&s=eca61993bdd45569ebd385cd3cc58971",
+        }, {
+          "id": "5",
+          "title": "Say it",
+          "author": "test",
+          "url": "https://youvix.org/songs/stream?song_id=2049&s=eca61993bdd45569ebd385cd3cc58971",
         }],
         metadata: {"id": "2", "title": "Playlist two"}
     )
@@ -47,6 +52,11 @@ class _MyAppState extends State<MyApp> {
     super.initState();
 
     BackgroundAudio.init().then((e) {
+
+      BackgroundAudio.setCustomOption("test", "test_value2");
+      BackgroundAudio.getCustomOption("test");
+      setState(() {});
+
       if (BackgroundAudio.playlist != null) {
         if (BackgroundAudio.playing) {
           setState(() => status = 'play');
@@ -91,6 +101,16 @@ class _MyAppState extends State<MyApp> {
 
   toggle() {
     BackgroundAudio.toggle();
+  }
+
+  toggleRepeat() async {
+    await BackgroundAudio.toggleRepeat();
+    setState(() {});
+  }
+
+  toggleShuffle() async {
+    await BackgroundAudio.toggleShuffle();
+    setState(() {});
   }
 
   play(BackgroundAudioPlaylist playlist, int index) async {
@@ -162,7 +182,7 @@ class _MyAppState extends State<MyApp> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Container(
-                child: FlatButton(padding: EdgeInsets.all(4.0), child: Icon(Icons.repeat, size: 24.0), onPressed: BackgroundAudio.toggleRepeat),
+                child: FlatButton(padding: EdgeInsets.all(4.0), child: Icon(Icons.repeat, size: 24.0, color: BackgroundAudio.repeat ? Colors.blue : Colors.black), onPressed: toggleRepeat),
                 width: 40.0
               ),
               Container(
@@ -178,7 +198,7 @@ class _MyAppState extends State<MyApp> {
                   width: 50.0
               ),
               Container(
-                  child: FlatButton(padding: EdgeInsets.all(4.0), child: Icon(Icons.shuffle, size: 24.0), onPressed: BackgroundAudio.toggleShuffle),
+                  child: FlatButton(padding: EdgeInsets.all(4.0), child: Icon(Icons.shuffle, size: 24.0, color: BackgroundAudio.shuffle ? Colors.blue : Colors.black), onPressed: toggleShuffle),
                   width: 40.0
               ),
             ]

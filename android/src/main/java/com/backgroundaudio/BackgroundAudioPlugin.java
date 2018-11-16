@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.EventChannel.StreamHandler;
@@ -102,6 +103,9 @@ public class BackgroundAudioPlugin implements MethodCallHandler, StreamHandler {
             case "getDuration":
                 result.success(AudioPlayer.getDuration());
                 break;
+            case "getIndex":
+                result.success(AudioPlayer.index);
+                break;
             case "getPlaylist":
                 result.success(AudioPlayer.getPlaylist());
                 break;
@@ -117,6 +121,29 @@ public class BackgroundAudioPlugin implements MethodCallHandler, StreamHandler {
             case "toggleShuffle":
                 AudioPlayer.shuffle = !AudioPlayer.shuffle;
                 result.success(true);
+                break;
+            case "getOptions":
+                Map options = new HashMap<String, String>();
+                options.put("repeat", AudioPlayer.repeat);
+                options.put("shuffle", AudioPlayer.shuffle);
+                options.put("custom", AudioPlayer.customOptions);
+                result.success(options);
+                break;
+            case "setCustomOption":
+                Object option = call.argument("option");
+                AudioPlayer.setCustomOption((HashMap)option);
+                result.success(true);
+                break;
+            case "getCustomOption":
+                String name = call.argument("name");
+                Object value = null;
+                for (Map map: AudioPlayer.customOptions) {
+                    if(map.get("name").equals(name)) {
+                        value = map.get("value");
+                        break;
+                    }
+                }
+                result.success(value);
                 break;
             default:
                 result.notImplemented();

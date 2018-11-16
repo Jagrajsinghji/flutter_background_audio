@@ -14,8 +14,8 @@ class BackgroundAudioPlaylist {
 
   factory BackgroundAudioPlaylist.fromJson(Map data) {
     return BackgroundAudioPlaylist(
-      songs: data['songs'].map<Map<String, dynamic>>((song) => Map.from<String, dynamic>(song)).toList(),
-      metadata: Map.from<String, dynamic>(data['metadata'])
+      songs: data['songs'].map<Map<String, dynamic>>((song) => Map.from(song)).toList(),
+      metadata: Map.from(data['metadata'])
     );
   }
 
@@ -42,6 +42,12 @@ class BackgroundAudio {
   }
 
   static init() async {
+    _methodChannel.invokeMethod('getOptions').then((options) {
+      print(options);
+      repeat = options['repeat'];
+      shuffle = options['shuffle'];
+    });
+
     Map data = await _methodChannel.invokeMethod('getPlaylist');
    
     if (data != null) {
@@ -60,6 +66,7 @@ class BackgroundAudio {
       _callEvent('position', data: position);
 
       if (duration <= 0) {
+        _callEvent('duration', data: position);
         _updateDuration();
       }
     });
@@ -79,14 +86,28 @@ class BackgroundAudio {
     }
   }
 
-  static toggleRepeat() {
+  static toggleRepeat() async {
     repeat = !repeat;
-    _methodChannel.invokeMethod('toggleRepeat');
+    await _methodChannel.invokeMethod('toggleRepeat');
   }
 
-  static toggleShuffle() {
+  static toggleShuffle() async {
     shuffle = !shuffle;
-    _methodChannel.invokeMethod('toggleShuffle');
+    await _methodChannel.invokeMethod('toggleShuffle');
+  }
+
+  static getOptions() async {
+    var options = await _methodChannel.invokeMethod('getOptions');
+    return options;
+  }
+
+  static setCustomOption(name, value) async {
+    await _methodChannel.invokeMethod('setCustomOption', {"option": {"name": name, "value": value}});
+  }
+
+  static getCustomOption(name) async {
+    var value = await _methodChannel.invokeMethod('getCustomOption', {"name": name});
+    return value;
   }
 
   static play(int i) async {
@@ -149,7 +170,7 @@ class BackgroundAudio {
     _listeners.addAll({"prev": callback});
   }
 
-  static _onEvent(dynamic name) {
+  static _onEvent(dynamic name) async {
     dynamic data;
 
     if (name == "next" || name == "prev") {
@@ -158,11 +179,8 @@ class BackgroundAudio {
       playing = true;
     }
 
-    if (name == "next") {
-      index = index == playlist.songs.length - 1 ? 0 : index + 1;
-    }
-    if (name == "prev") {
-      index = index == 0 ? playlist.songs.length - 1 : index - 1;
+    if (name == "next" || name == "prev") {
+      index = await _methodChannel.invokeMethod('getIndex');
     }
 
     if (name == "play") {
