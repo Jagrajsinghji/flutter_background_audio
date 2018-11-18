@@ -4,8 +4,6 @@ import 'package:flutter/services.dart';
 const MethodChannel _methodChannel = const MethodChannel('method_channel');
 const EventChannel _eventChannel = const EventChannel('event_channel');
 
-
-
 class BackgroundAudioPlaylist {
   List<Map<String, dynamic>> songs = [];
   Map<String, dynamic> metadata;
@@ -14,7 +12,10 @@ class BackgroundAudioPlaylist {
 
   factory BackgroundAudioPlaylist.fromJson(Map data) {
     return BackgroundAudioPlaylist(
-      songs: data['songs'].map<Map<String, dynamic>>((song) => Map.from(song)).toList(),
+      songs: data['songs'].map<Map<String, dynamic>>((song) {
+        Map<String, dynamic> map = Map.from(song);
+        return map;
+      }).toList(),
       metadata: Map.from(data['metadata'])
     );
   }
