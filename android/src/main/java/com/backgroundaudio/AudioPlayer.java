@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -185,6 +186,8 @@ public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
 
     @Override
     public void onCompletion(MediaPlayer mp) {
+        prepared = false;
+
         if (mp.getCurrentPosition() > 0) {
             if (!repeat) {
                 if (shuffle) {
@@ -223,10 +226,11 @@ public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
 
     private void play() {
         play = true;
+        String source = getSong().get("source");
 
         try{
             player.reset();
-            player.setDataSource(getSong().get("url"));
+            player.setDataSource(source);
             player.prepareAsync();
         }
         catch (Exception ignored) {}

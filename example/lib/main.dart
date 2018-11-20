@@ -17,12 +17,12 @@ class _MyAppState extends State<MyApp> {
           "id": "1",
           "title": "First song",
           "author": "Unknown",
-          "url": "https://youvix.org/songs/stream?song_id=671&s=867ad6332d7bc8f197e67cd34fbc7528",
+          "source": "https://youvix.org/songs/stream?song_id=671&s=867ad6332d7bc8f197e67cd34fbc7528",
         }, {
           "id": "2",
           "title": "say it",
           "author": "Blue oktober",
-          "url": "https://youvix.org/songs/stream?song_id=2049&s=eca61993bdd45569ebd385cd3cc58971",
+          "source": "https://youvix.org/songs/stream?song_id=2049&s=eca61993bdd45569ebd385cd3cc58971",
         }],
       metadata: {"id": "1", "title": "Playlist one"}
     ),
@@ -31,17 +31,17 @@ class _MyAppState extends State<MyApp> {
           "id": "3",
           "title": "First song(2 playlist)",
           "author": "Unknown",
-          "url": "https://youvix.org/songs/stream?song_id=671&s=867ad6332d7bc8f197e67cd34fbc7528",
+          "source": "https://youvix.org/songs/stream?song_id=671&s=867ad6332d7bc8f197e67cd34fbc7528",
         }, {
           "id": "4",
           "title": "New Order(2 playlist)",
           "author": "Blue Monday 88",
-          "url": "https://youvix.org/songs/stream?song_id=2049&s=eca61993bdd45569ebd385cd3cc58971",
+          "source": "https://youvix.org/songs/stream?song_id=2049&s=eca61993bdd45569ebd385cd3cc58971",
         }, {
           "id": "5",
           "title": "Say it",
           "author": "test",
-          "url": "https://youvix.org/songs/stream?song_id=2049&s=eca61993bdd45569ebd385cd3cc58971",
+          "source": "https://youvix.org/songs/stream?song_id=2049&s=eca61993bdd45569ebd385cd3cc58971",
         }],
         metadata: {"id": "2", "title": "Playlist two"}
     )
