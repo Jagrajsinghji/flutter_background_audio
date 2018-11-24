@@ -150,19 +150,4 @@ public class BackgroundAudioPlugin implements MethodCallHandler, StreamHandler {
                 break;
         }
     }
-
-//    public static void callEvent(String event) {
-//        methodChannel.invokeMethod(event, null, new Result() {
-//            @Override
-//            public void success(Object o) {
-//                // this will be called with o = "some string"
-//            }
-//
-//            @Override
-//            public void error(String s, String s1, Object o) {}
-//
-//            @Override
-//            public void notImplemented() {}
-//        });
-//    }
 }

@@ -143,36 +143,44 @@ class BackgroundAudio {
   }
 
   static onDuration(Function(int duration) callback) {
+    print('BackgroundAudio: Added listener "onDuration"\n');
     _listeners.addAll({"duration": callback});
   }
 
   static onPosition(Function(int duration) callback) {
+    print('BackgroundAudio: Added listener "onPosition"\n');
     _listeners.addAll({"position": callback});
   }
 
   static onTogglePlayback(Function(bool playing) callback) {
+    print('BackgroundAudio: Added listener "onTogglePlayback"\n');
     _listeners.addAll({"toggle_playback": callback});
   }
 
   static onStop(Function callback) {
+    print('BackgroundAudio: Added listener "onStop"\n');
     playing = false;
     _listeners.addAll({"stop": callback});
   }
 
   static onSelect(Function callback) {
+    print('BackgroundAudio: Added listener "onSelect"\n');
     _listeners.addAll({"select": callback});
   }
   
   static onNext(Function callback) {
+    print('BackgroundAudio: Added listener "onNext"\n');
     _listeners.addAll({"next": callback});
   }
   
   static onPrev(Function callback) {
+    print('BackgroundAudio: Added listener "onPrev"\n');
     _listeners.addAll({"prev": callback});
   }
 
   static _onEvent(dynamic name) async {
     dynamic data;
+    print('BackgroundAudio: Event "$name"\n');
 
     if (name == "next" || name == "prev") {
       position = 0;
@@ -202,6 +210,10 @@ class BackgroundAudio {
   static _callEvent(dynamic name, {dynamic data}) {
     _listeners.forEach((event, callback) {
       if (name == event) {
+        if (name != 'position' && name != 'duration') {
+          print('BackgroundAudio: Calling listeners for "$name"\n');
+        }
+
         if (data == null) {
           callback();
         } else {
