@@ -172,8 +172,6 @@ public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
                 player.stop();
                 player.release();
                 prepared = false;
-                songs = new ArrayList<Map<String, String>>();
-                metadata = new HashMap<String, String>();
                 customOptions = new ArrayList<Map>();
                 index = 0;
                 callEvent("stop");
