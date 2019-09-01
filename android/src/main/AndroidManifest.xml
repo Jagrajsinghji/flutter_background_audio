@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 package="com.backgroundaudio">
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 <application>
     <receiver android:name=".AudioPlayer$NotificationReturnSlot">
         <intent-filter>
@@ -8,7 +9,7 @@ package="com.backgroundaudio">
             <action android:name="action.PREV" />
         </intent-filter>
     </receiver>
-    <service android:name=".AudioPlayer" android:enabled="true">
+    <service android:name=".AudioPlayer">
         <intent-filter>
             <action android:name="action.PLAY" />
             <action android:name="action.TOGGLE" />

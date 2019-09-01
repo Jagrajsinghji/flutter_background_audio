@@ -36,9 +36,10 @@ class BackgroundAudio {
   static bool shuffle = false;
 
   static Map<String, dynamic> get song {
-    if (playlist == null || playlist.songs.length == 0) {
+    if (playlist == null || playlist.songs.length == 0 || index == null) {
       return null;
     }
+
     return playlist.songs[index];
   }
 

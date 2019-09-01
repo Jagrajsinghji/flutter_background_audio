@@ -17,12 +17,12 @@ class _MyAppState extends State<MyApp> {
           "id": "1",
           "title": "First song",
           "author": "Unknown",
-          "source": "https://youvix.org/songs/stream?song_id=671&s=867ad6332d7bc8f197e67cd34fbc7528",
+          "source": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
         }, {
           "id": "2",
           "title": "say it",
           "author": "Blue oktober",
-          "source": "https://youvix.org/songs/stream?song_id=2049&s=eca61993bdd45569ebd385cd3cc58971",
+          "source": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
         }],
       metadata: {"id": "1", "title": "Playlist one"}
     ),
@@ -31,17 +31,17 @@ class _MyAppState extends State<MyApp> {
           "id": "3",
           "title": "First song(2 playlist)",
           "author": "Unknown",
-          "source": "https://youvix.org/songs/stream?song_id=671&s=867ad6332d7bc8f197e67cd34fbc7528",
+          "source": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
         }, {
           "id": "4",
           "title": "New Order(2 playlist)",
           "author": "Blue Monday 88",
-          "source": "https://youvix.org/songs/stream?song_id=2049&s=eca61993bdd45569ebd385cd3cc58971",
+          "source": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
         }, {
           "id": "5",
           "title": "Say it",
           "author": "test",
-          "source": "https://youvix.org/songs/stream?song_id=2049&s=eca61993bdd45569ebd385cd3cc58971",
+          "source": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
         }],
         metadata: {"id": "2", "title": "Playlist two"}
     )
@@ -145,65 +145,67 @@ class _MyAppState extends State<MyApp> {
 
     var player = BackgroundAudio.song == null ? Container() : Container(
       height: 240.0,
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              FlatButton(child: Icon(Icons.close), onPressed: stop),
-            ],
-          ),
-          Divider(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              BackgroundAudio.song == null ? Container() :
-              Flexible(
-                child: Column(children: <Widget>[
-                  Text(BackgroundAudio.song["title"], style: TextStyle(fontSize: 16.0)),
-                  Text(BackgroundAudio.song["author"]),
-                  SizedBox(height: 12.0),
-                  Text((BackgroundAudio.playlist.metadata["title"] ?? ""), 
-                    style: TextStyle(fontSize: 16.0, color: Colors.grey),
-                  ),
-                ]),
-              ),
-            ]
-          ),
-          Text(BackgroundAudio.position.toString()+'/'+BackgroundAudio.duration.toString()),
-           Slider(
-             onChanged: (val) {
-               BackgroundAudio.seekTo(val.toInt());
-             },
-             value: BackgroundAudio.position.toDouble(),
-             max: BackgroundAudio.duration.toDouble(),
-           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Container(
-                child: FlatButton(padding: EdgeInsets.all(4.0), child: Icon(Icons.repeat, size: 24.0, color: BackgroundAudio.repeat ? Colors.blue : Colors.black), onPressed: toggleRepeat),
-                width: 40.0
-              ),
-              Container(
-                  child: FlatButton(padding: EdgeInsets.all(4.0), child: Icon(Icons.skip_previous, size: 30.0), onPressed: BackgroundAudio.prev),
-                  width: 50.0
-              ),
-              Container(
-                  child: FlatButton(padding: EdgeInsets.all(4.0), child: Icon(status == 'pause' ? Icons.play_circle_outline : Icons.pause_circle_outline, size: 40.0,), onPressed: toggle),
-                  width: 60.0
-              ),
-              Container(
-                  child: FlatButton(padding: EdgeInsets.all(4.0), child: Icon(Icons.skip_next, size: 30.0), onPressed: BackgroundAudio.next),
-                  width: 50.0
-              ),
-              Container(
-                  child: FlatButton(padding: EdgeInsets.all(4.0), child: Icon(Icons.shuffle, size: 24.0, color: BackgroundAudio.shuffle ? Colors.blue : Colors.black), onPressed: toggleShuffle),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                FlatButton(child: Icon(Icons.close), onPressed: stop),
+              ],
+            ),
+            Divider(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                BackgroundAudio.song == null ? Container() :
+                Flexible(
+                  child: Column(children: <Widget>[
+                    Text(BackgroundAudio.song["title"], style: TextStyle(fontSize: 16.0)),
+                    Text(BackgroundAudio.song["author"]),
+                    SizedBox(height: 12.0),
+                    Text((BackgroundAudio.playlist.metadata["title"] ?? ""),
+                      style: TextStyle(fontSize: 16.0, color: Colors.grey),
+                    ),
+                  ]),
+                ),
+              ]
+            ),
+            Text(BackgroundAudio.position.toString()+'/'+BackgroundAudio.duration.toString()),
+             Slider(
+               onChanged: (val) {
+                 BackgroundAudio.seekTo(val.toInt());
+               },
+               value: BackgroundAudio.position.toDouble(),
+               max: BackgroundAudio.duration.toDouble(),
+             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Container(
+                  child: FlatButton(padding: EdgeInsets.all(4.0), child: Icon(Icons.repeat, size: 24.0, color: BackgroundAudio.repeat ? Colors.blue : Colors.black), onPressed: toggleRepeat),
                   width: 40.0
-              ),
-            ]
-          ),
-        ]
+                ),
+                Container(
+                    child: FlatButton(padding: EdgeInsets.all(4.0), child: Icon(Icons.skip_previous, size: 30.0), onPressed: BackgroundAudio.prev),
+                    width: 50.0
+                ),
+                Container(
+                    child: FlatButton(padding: EdgeInsets.all(4.0), child: Icon(status == 'pause' ? Icons.play_circle_outline : Icons.pause_circle_outline, size: 40.0,), onPressed: toggle),
+                    width: 60.0
+                ),
+                Container(
+                    child: FlatButton(padding: EdgeInsets.all(4.0), child: Icon(Icons.skip_next, size: 30.0), onPressed: BackgroundAudio.next),
+                    width: 50.0
+                ),
+                Container(
+                    child: FlatButton(padding: EdgeInsets.all(4.0), child: Icon(Icons.shuffle, size: 24.0, color: BackgroundAudio.shuffle ? Colors.blue : Colors.black), onPressed: toggleShuffle),
+                    width: 40.0
+                ),
+              ]
+            ),
+          ]
+        ),
       ),
     );
 
