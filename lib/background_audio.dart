@@ -12,12 +12,11 @@ class BackgroundAudioPlaylist {
 
   factory BackgroundAudioPlaylist.fromJson(Map data) {
     return BackgroundAudioPlaylist(
-      songs: data['songs'].map<Map<String, dynamic>>((song) {
-        Map<String, dynamic> map = Map.from(song);
-        return map;
-      }).toList(),
-      metadata: Map.from(data['metadata'])
-    );
+        songs: data['songs'].map<Map<String, dynamic>>((song) {
+          Map<String, dynamic> map = Map.from(song);
+          return map;
+        }).toList(),
+        metadata: Map.from(data['metadata']));
   }
 
   Map<String, dynamic> toMap() {
@@ -51,7 +50,7 @@ class BackgroundAudio {
     });
 
     Map data = await _methodChannel.invokeMethod('getPlaylist');
-   
+
     if (data != null) {
       index = data["index"] as int;
       playing = data["playing"] as bool;
@@ -61,16 +60,16 @@ class BackgroundAudio {
     _eventChannel.receiveBroadcastStream().listen(_onEvent);
 
     Timer.periodic(new Duration(milliseconds: 500), (Timer timer) async {
-      if (playlist == null || !playing) {
-        return;
-      }
-      position = await _methodChannel.invokeMethod('getPosition');
-      _callEvent('position', data: position);
+      if (playlist != null && playing) {
+        position = await _methodChannel.invokeMethod('getPosition');
+        _callEvent('position', data: position);
 
-      if (duration <= 0) {
-        _callEvent('duration', data: position);
-        _updateDuration();
-      }
+        if (duration <= 0) {
+          _callEvent('duration', data: position);
+          _updateDuration();
+        }
+      } else
+        return;
     });
   }
 
@@ -82,10 +81,8 @@ class BackgroundAudio {
   }
 
   static setPlaylist(BackgroundAudioPlaylist p) async {
-    if (BackgroundAudio.playlist != p) {
-      BackgroundAudio.playlist = p;
-      await _methodChannel.invokeMethod('setPlaylist', {"playlist": p.toMap()});
-    }
+    playlist = p;
+    await _methodChannel.invokeMethod('setPlaylist', {"playlist": p.toMap()});
   }
 
   static toggleRepeat() async {
@@ -104,11 +101,14 @@ class BackgroundAudio {
   }
 
   static setCustomOption(name, value) async {
-    await _methodChannel.invokeMethod('setCustomOption', {"option": {"name": name, "value": value}});
+    await _methodChannel.invokeMethod('setCustomOption', {
+      "option": {"name": name, "value": value}
+    });
   }
 
   static getCustomOption(name) async {
-    var value = await _methodChannel.invokeMethod('getCustomOption', {"name": name});
+    var value =
+        await _methodChannel.invokeMethod('getCustomOption', {"name": name});
     return value;
   }
 
@@ -168,12 +168,12 @@ class BackgroundAudio {
     print('BackgroundAudio: Added listener "onSelect"\n');
     _listeners.addAll({"select": callback});
   }
-  
+
   static onNext(Function callback) {
     print('BackgroundAudio: Added listener "onNext"\n');
     _listeners.addAll({"next": callback});
   }
-  
+
   static onPrev(Function callback) {
     print('BackgroundAudio: Added listener "onPrev"\n');
     _listeners.addAll({"prev": callback});

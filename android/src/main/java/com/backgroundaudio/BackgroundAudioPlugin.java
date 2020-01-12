@@ -18,7 +18,9 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 import static com.backgroundaudio.AudioPlayer.SERVICE_EVENT;
 
-/** BackgroundAudioPlugin */
+/**
+ * BackgroundAudioPlugin
+ */
 public class BackgroundAudioPlugin implements MethodCallHandler, StreamHandler {
     private static String TAG = "DEBUG";
     private Registrar registrar;
@@ -62,7 +64,6 @@ public class BackgroundAudioPlugin implements MethodCallHandler, StreamHandler {
     @Override
     public void onMethodCall(MethodCall call, Result result) {
         Intent intent;
-
         switch (call.method) {
             case "play":
                 result.success(true);
@@ -94,8 +95,8 @@ public class BackgroundAudioPlugin implements MethodCallHandler, StreamHandler {
                 registrar.context().startService(intent);
                 break;
             case "seekTo":
-              Integer sec = call.argument("sec");
-              AudioPlayer.seekTo(sec);
+                Integer sec = call.argument("sec");
+                AudioPlayer.seekTo(sec);
                 break;
             case "getPosition":
                 result.success(AudioPlayer.getPosition());
@@ -111,7 +112,7 @@ public class BackgroundAudioPlugin implements MethodCallHandler, StreamHandler {
                 break;
             case "setPlaylist":
                 Object playlist = call.argument("playlist");
-                AudioPlayer.setPlaylist((HashMap)playlist);
+                AudioPlayer.setPlaylist((HashMap) playlist);
                 result.success(true);
                 break;
             case "toggleRepeat":
@@ -131,14 +132,14 @@ public class BackgroundAudioPlugin implements MethodCallHandler, StreamHandler {
                 break;
             case "setCustomOption":
                 Object option = call.argument("option");
-                AudioPlayer.setCustomOption((HashMap)option);
+                AudioPlayer.setCustomOption((HashMap) option);
                 result.success(true);
                 break;
             case "getCustomOption":
                 String name = call.argument("name");
                 Object value = null;
-                for (Map map: AudioPlayer.customOptions) {
-                    if(map.get("name").equals(name)) {
+                for (Map map : AudioPlayer.customOptions) {
+                    if (map.get("name").equals(name)) {
                         value = map.get("value");
                         break;
                     }

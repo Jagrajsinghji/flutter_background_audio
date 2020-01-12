@@ -11,11 +11,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
@@ -29,10 +27,11 @@ import java.util.Random;
 
 /**
  * Created by dmitry on 02.10.18.
+ * Edited by jagrajsinghji on 28.12.19
  */
 
 public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
-        MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener {
+        MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener, AudioManager.OnAudioFocusChangeListener {
 
     public static final String SERVICE_EVENT = "AudioPlayerSericeEvent";
     public static final String ACTION_PLAY = "action.PLAY";
@@ -45,15 +44,17 @@ public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
 
     private static NotificationManager mNM;
     private static MediaPlayer player;
+    private static AudioManager audioManager;
+
 
     public static boolean play = false;
     public static boolean prepared = false;
 
-    private static List<Map<String, String>> songs = new ArrayList<Map<String, String>>();
-    private static Map<String, String> metadata = new HashMap<String, String>();
+    private static List<Map<String, String>> songs = new ArrayList<>();
+    private static Map<String, String> metadata = new HashMap<>();
     public static int index = 0;
 
-    public static List<Map> customOptions = new ArrayList<Map>();
+    public static List<Map> customOptions = new ArrayList<>();
 
     public static boolean repeat = false;
     public static boolean shuffle = false;
@@ -66,14 +67,14 @@ public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
         player.setOnErrorListener(this);
         player.setOnCompletionListener(this);
 
-        mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         createNotificationChannel();
         showNotification();
     }
 
     public static void setCustomOption(HashMap option) {
-        for (Map map: AudioPlayer.customOptions) {
-            if(map.get("name").equals(option.get("name"))) {
+        for (Map map : AudioPlayer.customOptions) {
+            if (map.get("name").equals(option.get("name"))) {
                 map.clear();
                 map.put("name", option.get("name"));
                 map.put("value", option.get("value"));
@@ -85,8 +86,10 @@ public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
 
     public static void setPlaylist(HashMap p) {
         if (p != null) {
-            songs = (List<Map<String, String>>)p.get("songs");
-            metadata = (Map<String, String>)p.get("metadata");
+            songs.clear();
+            metadata.clear();
+            songs = (List<Map<String, String>>) p.get("songs");
+            metadata = (Map<String, String>) p.get("metadata");
         }
     }
 
@@ -107,7 +110,7 @@ public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
     }
 
     public static Map<String, String> getSong() {
-        return songs.get(index);
+        return songs.isEmpty() || songs.size() <= 0 ? new HashMap() : songs.get(index);
     }
 
     public static int getPosition() {
@@ -137,10 +140,14 @@ public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
     }
 
     @Override
-    public IBinder onBind(Intent intent) {return null;}
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
 
     @Override
-    public boolean onUnbind(Intent intent) {return false;}
+    public boolean onUnbind(Intent intent) {
+        return false;
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -160,12 +167,12 @@ public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
                 callEvent("select");
                 break;
             case ACTION_NEXT:
-                index = index == songs.size()-1 ? 0 : index+1;
+                index = index == songs.size() - 1 ? 0 : index + 1;
                 play();
                 callEvent("next");
                 break;
             case ACTION_PREV:
-                index = index == 0 ? songs.size()-1 : index-1;
+                index = index == 0 ? songs.size() - 1 : index - 1;
                 play();
                 callEvent("prev");
                 break;
@@ -174,7 +181,6 @@ public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
                 player.stop();
                 player.release();
                 prepared = false;
-                customOptions = new ArrayList<Map>();
                 index = 0;
                 callEvent("stop");
                 stopSelf();
@@ -192,16 +198,16 @@ public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
             if (!repeat) {
                 if (shuffle) {
                     Random r = new Random();
-                    int max = songs.size()-1;
+                    int max = songs.size() - 1;
                     int min = 0;
-                    int new_index = r.nextInt((max-min)+1)+min;
+                    int new_index = r.nextInt((max - min) + 1) + min;
                     if (new_index == index) {
-                        new_index = new_index > 0 ? new_index-1 : max;
+                        new_index = new_index > 0 ? new_index - 1 : max;
                     }
 
                     index = new_index;
                 } else {
-                    index = index == songs.size()-1 ? 0 : index+1;
+                    index = index == songs.size() - 1 ? 0 : index + 1;
                 }
                 callEvent("next");
                 play();
@@ -225,18 +231,25 @@ public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
     }
 
     private void play() {
+        // request audio focus in case other app is playing audio
+        requestAudioFocus();
         play = true;
         String source = getSong().get("source");
+        if (source != null) {
+            try {
+                player.reset();
+                player.setDataSource(source);
+                player.prepareAsync();
 
-        try{
-            player.reset();
-            player.setDataSource(source);
-            player.prepareAsync();
-        }
-        catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
 
-        showNotification();
+            showNotification();
+
     }
+    else{
+        android.util.Log.e("PLAY","NOSOURCEOFSNG");
+        }}
 
     private void toggle() {
         play = !play;
@@ -268,11 +281,11 @@ public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
                 .setSound(null);
 
         RemoteViews remoteView = new RemoteViews(this.getPackageName(), R.layout.notificationlayout);
-        remoteView.setTextViewText(R.id.title, getSong().get("title"));
-        remoteView.setTextViewText(R.id.author, getSong().get("author"));
+        remoteView.setTextViewText(R.id.mediaTitle, getSong().get("title"));
+        remoteView.setTextViewText(R.id.mediaSubtitle, getSong().get("author"));
 
         String icon = play ? "baseline_pause_black_48" : "baseline_play_arrow_black_48";
-        remoteView.setImageViewResource(R.id.toggle, getResources().getIdentifier(icon,"drawable", this.getPackageName()));
+        remoteView.setImageViewResource(R.id.toggle, getResources().getIdentifier(icon, "drawable", this.getPackageName()));
 
         setNotificationListeners(remoteView);
         nBuilder.setContent(remoteView);
@@ -281,31 +294,78 @@ public class AudioPlayer extends Service implements MediaPlayer.OnErrorListener,
         startForeground(1, notification);
     }
 
-    public void setNotificationListeners(RemoteViews view){
-        // Пауза/Воспроизведение
+    public void setNotificationListeners(RemoteViews view) {
+        // Пауза/Воспроизведение :Play pause
         Intent intent = new Intent(this, NotificationReturnSlot.class).setAction(ACTION_TOGGLE);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         view.setOnClickPendingIntent(R.id.toggle, pendingIntent);
 
-        // Вперед
+        // Вперед:Forward
         Intent nextIntent = new Intent(this, NotificationReturnSlot.class).setAction(ACTION_NEXT);
         PendingIntent pendingNextIntent = PendingIntent.getBroadcast(this, 0, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         view.setOnClickPendingIntent(R.id.next, pendingNextIntent);
 
-        // Назад
+        // Назад:Back
         Intent prevIntent = new Intent(this, NotificationReturnSlot.class).setAction(ACTION_PREV);
         PendingIntent pendingPrevIntent = PendingIntent.getBroadcast(this, 0, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         view.setOnClickPendingIntent(R.id.prev, pendingPrevIntent);
 
-        // Закрыть
+        // Закрыть:Close
         Intent closeIntent = new Intent(this, NotificationReturnSlot.class).setAction(ACTION_STOP);
         PendingIntent pendingCloseIntent = PendingIntent.getBroadcast(this, 0, closeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         view.setOnClickPendingIntent(R.id.close, pendingCloseIntent);
 
-        // Нажатие на уведомление
+        // Нажатие на уведомление :Click Notification
         Intent selectIntent = new Intent(this, NotificationReturnSlot.class).setAction(ACTION_SELECT);
         PendingIntent selectPendingIntent = PendingIntent.getBroadcast(this, 0, selectIntent, PendingIntent.FLAG_CANCEL_CURRENT);
         view.setOnClickPendingIntent(R.id.layout, selectPendingIntent);
+    }
+
+    @Override
+    public void onAudioFocusChange(int focusChange) {
+        //Invoked when the audio focus of the system is updated.
+        switch (focusChange) {
+            case AudioManager.AUDIOFOCUS_GAIN:
+                if (player.isPlaying()) player.setVolume(1.0f, 1.0f);
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS:
+                // Lost focus for an unbounded amount of time: stop playback and release media player
+                if (player.isPlaying()) player.stop();
+                player.release();
+                mNM.cancel(1);
+                prepared = false;
+                index = 0;
+                callEvent("stop");
+                stopSelf();
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                // Lost focus for a short time, but we have to stop
+                // playback. We don't release the media player because playback
+                // is likely to resume
+                if (player.isPlaying()) {
+                    play = false;
+                    player.pause();
+                    callEvent("pause");
+                }
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                // Lost focus for a short time, but it's ok to keep playing
+                // at an attenuated level
+                if (player.isPlaying()) player.setVolume(0.1f, 0.1f);
+                break;
+        }
+        showNotification();
+    }
+
+    private boolean requestAudioFocus() {
+        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        int result = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            //Focus gained
+            return true;
+        }
+        //Could not gain focus
+        return false;
     }
 
     public static class NotificationReturnSlot extends BroadcastReceiver {

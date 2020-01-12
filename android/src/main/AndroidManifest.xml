@@ -1,5 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 package="com.backgroundaudio">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- For the status of any ongoing call-->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 <application>
     <receiver android:name=".AudioPlayer$NotificationReturnSlot">
